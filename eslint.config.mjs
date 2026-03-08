@@ -9,17 +9,19 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    plugins: {
-      boundaries,
-      "simple-import-sort": simpleImportSort,
-    },
+    plugins: { boundaries, "simple-import-sort": simpleImportSort },
     settings: {
       "boundaries/elements": [
-        { type: "app", pattern: "src/app/*" },
-        { type: "config", pattern: "src/config/*" },
-        { type: "features", pattern: "src/features/*" },
-        { type: "infrastructure", pattern: "src/infrastructure/*" },
-        { type: "shared", pattern: "src/shared/*" },
+        { type: "app", pattern: "src/app/**" },
+        { type: "config", pattern: "src/config/**" },
+        {
+          type: "feature",
+          pattern: "src/features/*",
+          mode: "folder",
+          capture: ["feature"],
+        },
+        { type: "infrastructure", pattern: "src/infrastructure/**" },
+        { type: "shared", pattern: "src/shared/**" },
       ],
     },
     rules: {
@@ -28,26 +30,19 @@ const eslintConfig = defineConfig([
         {
           default: "disallow",
           rules: [
+            { from: "app", allow: ["feature", "infrastructure", "shared", "config"] },
             {
-              from: "app",
-              allow: ["features", "infrastructure", "shared", "config"],
+              from: "feature",
+              allow: [
+                ["feature", { feature: "${feature}" }],
+                "shared",
+                "infrastructure",
+                "config",
+              ],
             },
-            {
-              from: "features",
-              allow: ["infrastructure", "shared", "config"],
-            },
-            {
-              from: "infrastructure",
-              allow: ["shared", "config"],
-            },
-            {
-              from: "config",
-              allow: ["shared"],
-            },
-            {
-              from: "shared",
-              allow: ["shared"],
-            },
+            { from: "infrastructure", allow: ["shared", "config"] },
+            { from: "config", allow: ["shared"] },
+            { from: "shared", allow: ["shared"] },
           ],
         },
       ],
