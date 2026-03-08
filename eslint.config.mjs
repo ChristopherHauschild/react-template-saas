@@ -56,13 +56,10 @@ const eslintConfig = defineConfig([
         "error",
         {
           groups: [
-            ["^react", "^next"],
-            ["^@/app"],
-            ["^@/features"],
-            ["^@/infrastructure"],
-            ["^@/shared"],
-            ["^@/config"],
             ["^\\u0000"],
+            ["^react", "^next"],
+            ["^@?\\w"],
+            ["^@/"],
             ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
             ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
             ["^.+\\.?(css)$"],
