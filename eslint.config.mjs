@@ -2,12 +2,16 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import boundaries from "eslint-plugin-boundaries";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    plugins: { boundaries },
+    plugins: {
+      boundaries,
+      "simple-import-sort": simpleImportSort,
+    },
     settings: {
       "boundaries/elements": [
         { type: "app", pattern: "src/app/*" },
@@ -47,9 +51,26 @@ const eslintConfig = defineConfig([
         },
       ],
       "boundaries/no-private": "error",
+      "simple-import-sort/imports": [
+        "error",
+        {
+          groups: [
+            ["^react", "^next"],
+            ["^@/app"],
+            ["^@/features"],
+            ["^@/infrastructure"],
+            ["^@/shared"],
+            ["^@/config"],
+            ["^\\u0000"],
+            ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+            ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+            ["^.+\\.?(css)$"],
+          ],
+        },
+      ],
+      "simple-import-sort/exports": "error",
     },
   },
-  // Override default ignores of eslint-config-next.
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
 ]);
 

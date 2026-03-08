@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import { cn } from "@/shared/utils/cn";
+
 import { CheckIcon, ChevronRightIcon } from "lucide-react";
+import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 function DropdownMenu({
   ...props
@@ -256,18 +257,18 @@ function DropdownMenuSubContent({
 
 export {
   DropdownMenu,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuLabel,
   DropdownMenuItem,
-  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSub,
-  DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 };
