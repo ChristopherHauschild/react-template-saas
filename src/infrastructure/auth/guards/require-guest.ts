@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
 
-import { createClient } from "../supabase/server";
+import { getCurrentUser } from "../utils/get-current-user";
 
 export async function requireGuest() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (user) {
     redirect("/dashboard");
