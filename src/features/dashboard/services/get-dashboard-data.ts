@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/infrastructure/auth/utils/get-current-user";
+import { getCurrentUser } from "@/infrastructure/auth/session/get-current-user";
 
 export async function getDashboardData() {
   const user = await getCurrentUser();
