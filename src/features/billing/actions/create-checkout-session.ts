@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/infrastructure/auth/session/get-current-user";
-import { stripe } from "@/infrastructure/stripe";
+import { getStripe } from "@/infrastructure/stripe";
 
 export async function createCheckoutSession(priceId: string) {
   const user = await getCurrentUser();
@@ -12,7 +12,7 @@ export async function createCheckoutSession(priceId: string) {
     throw new Error("User not authenticated");
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
     customer_email: user.email,

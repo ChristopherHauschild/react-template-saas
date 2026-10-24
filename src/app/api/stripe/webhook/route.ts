@@ -3,22 +3,31 @@ import { headers } from "next/headers";
 import Stripe from "stripe";
 
 import { createClient } from "@/infrastructure/auth/supabase/server";
-import { stripe } from "@/infrastructure/stripe";
+import { getStripe } from "@/infrastructure/stripe";
 
 export async function POST(req: Request) {
   const body = await req.text();
 
-  const signature = (await headers()).get("stripe-signature")!;
+  const signature = (await headers()).get("stripe-signature");
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!signature) {
+    return new Response("Missing stripe-signature header", { status: 400 });
+  }
+
+  if (!webhookSecret) {
+    throw new Error("STRIPE_WEBHOOK_SECRET is not configured");
+  }
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!,
+      webhookSecret,
     );
-  } catch (err) {
+  } catch {
     return new Response("Webhook error", { status: 400 });
   }
 
