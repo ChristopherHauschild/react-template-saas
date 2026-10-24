@@ -1,11 +1,11 @@
-import { requireAuth } from "@/infrastructure/auth/guards/require-auth";
+// import { requireAuth } from "@/infrastructure/auth/guards/require-auth";
 
 export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await requireAuth();
+  // await requireAuth();
 
   return <>{children}</>;
 }

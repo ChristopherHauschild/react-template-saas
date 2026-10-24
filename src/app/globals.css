@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-body {
-  @apply bg-background text-foreground;
-}
-
 :root {
   --background: 0 0% 100%;
   --foreground: 222 47% 11%;

@@ -3,37 +3,64 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { CreditCard, LayoutDashboard, Settings } from "lucide-react";
+
+import { useSidebar } from "../store/useSidebar";
+
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { collapsed } = useSidebar();
 
-  const links = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Billing", href: "/billing" },
-    { label: "Settings", href: "/settings" },
+  const nav = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      label: "Billing",
+      href: "/billing",
+      icon: CreditCard,
+    },
+    {
+      label: "Settings",
+      href: "/settings",
+      icon: Settings,
+    },
   ];
 
   return (
-    <aside className="hidden md:flex w-64 flex-col border-r bg-muted/40 backdrop-blur">
-      <div className="flex h-16 items-center px-6 border-b">
-        <span className="text-lg font-semibold tracking-tight">Your SaaS</span>
+    <aside
+      className={`hidden md:flex flex-col border-r border-border bg-primary/10 transition-all duration-300
+      ${collapsed ? "w-16" : "w-64"}`}
+    >
+      <div
+        className={`flex h-16 items-center font-semibold text-primary
+        ${collapsed ? "justify-center" : "px-6"}`}
+      >
+        {collapsed ? "S" : "Your SaaS"}
       </div>
 
-      <nav className="flex flex-col gap-1 p-4">
-        {links.map((link) => {
-          const active = pathname === link.href;
+      <nav className="flex flex-col gap-1 px-2 py-4">
+        {nav.map((item) => {
+          const Icon = item.icon;
+          const active = pathname === item.href;
 
           return (
             <Link
-              key={link.href}
-              href={link.href}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition
-                ${
-                  active
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
+              key={item.href}
+              href={item.href}
+              className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition
+              ${
+                active
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-foreground/70 hover:bg-primary/20"
+              }
+              ${collapsed ? "justify-center" : "gap-3"}`}
             >
-              {link.label}
+              <Icon size={18} />
+
+              {!collapsed && item.label}
             </Link>
           );
         })}
