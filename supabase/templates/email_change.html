@@ -1,0 +1,19 @@
+<h2>Confirm your new email address</h2>
+
+<p>
+  A request was made to change the email address of your account from
+  <strong>{{ .Email }}</strong> to <strong>{{ .NewEmail }}</strong>.
+</p>
+
+<p>Follow this link to confirm the change:</p>
+
+<p>
+  <a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email_change"
+    >Confirm email change</a
+  >
+</p>
+
+<p>
+  If you didn't request this, you can ignore this email: your address will not change
+  unless the link is opened.
+</p>

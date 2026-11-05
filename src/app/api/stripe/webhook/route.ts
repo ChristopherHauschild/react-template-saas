@@ -1,14 +1,18 @@
-import { headers } from "next/headers";
-
 import Stripe from "stripe";
 
-import { createClient } from "@/infrastructure/auth/supabase/server";
+import {
+  handleStripeWebhookEvent,
+  type StripeWebhookOutcome,
+} from "@/features/billing/services/handle-stripe-webhook-event";
 import { getStripe } from "@/infrastructure/stripe";
+import { createAdminClient } from "@/infrastructure/supabase/admin";
+
+const LOG_PREFIX = "[stripe-webhook]";
 
 export async function POST(req: Request) {
   const body = await req.text();
 
-  const signature = (await headers()).get("stripe-signature");
+  const signature = req.headers.get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!signature) {
@@ -22,46 +26,75 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    event = getStripe().webhooks.constructEvent(
-      body,
-      signature,
-      webhookSecret,
-    );
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch {
     return new Response("Webhook error", { status: 400 });
   }
 
-  const supabase = await createClient();
+  // Stripe's request carries no user session, so persistence runs through the
+  // privileged server-side client rather than the cookie-based one.
+  let outcome: StripeWebhookOutcome;
 
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
+  try {
+    outcome = await handleStripeWebhookEvent(event, createAdminClient());
+  } catch (error) {
+    console.error(`${LOG_PREFIX} unexpected error while processing event`, {
+      eventId: event.id,
+      eventType: event.type,
+      error,
+    });
 
-      const subscriptionId = session.subscription as string;
-      const customerId = session.customer as string;
-      const userId = session.metadata?.userId as string;
-
-      await supabase.from("subscriptions").insert({
-        stripe_customer_id: customerId,
-        stripe_subscription_id: subscriptionId,
-        status: "active",
-        userId,
-      });
-
-      break;
-    }
-
-    case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
-
-      await supabase
-        .from("subscriptions")
-        .update({ status: "canceled" })
-        .eq("stripe_subscription_id", subscription.id);
-
-      break;
-    }
+    // Non-2xx: Stripe will retry the event.
+    return new Response("Webhook processing error", { status: 500 });
   }
 
-  return new Response("ok");
+  switch (outcome.kind) {
+    case "failed":
+      console.error(`${LOG_PREFIX} persistence failed; event not acknowledged`, {
+        eventId: event.id,
+        eventType: outcome.eventType,
+        error: outcome.error,
+      });
+
+      // Non-2xx: Stripe will retry the event. Details stay in server logs.
+      return new Response("Persistence error", { status: 500 });
+
+    case "skipped":
+      if (outcome.reason !== "unhandled_event_type") {
+        console.warn(`${LOG_PREFIX} event acknowledged without a write`, {
+          eventId: event.id,
+          eventType: outcome.eventType,
+          reason: outcome.reason,
+          detail: outcome.detail,
+        });
+      }
+
+      return new Response("ok");
+
+    case "duplicate":
+      // Already applied by an earlier delivery (e.g. our response was lost, or a
+      // concurrent delivery won). Acknowledge so Stripe stops retrying.
+      console.info(`${LOG_PREFIX} duplicate delivery acknowledged`, {
+        eventId: outcome.eventId,
+        eventType: outcome.eventType,
+      });
+
+      return new Response("ok");
+
+    case "stale":
+      // Delivered out of order: a newer position was already applied to this
+      // subscription, so its status was left alone. Nothing to retry.
+      console.info(
+        `${LOG_PREFIX} out-of-order event acknowledged without status change`,
+        {
+          eventId: outcome.eventId,
+          eventType: outcome.eventType,
+        },
+      );
+
+      return new Response("ok");
+
+    case "processed":
+      return new Response("ok");
+  }
 }

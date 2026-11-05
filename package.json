@@ -1,5 +1,5 @@
 {
-  "name": "react-template-saas",
+  "name": "react-saas-template",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,7 +8,18 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "test": "vitest run",
+    "test:db": "bash scripts/with-local-postgres.sh npx vitest run integration.test",
+    "test:watch": "vitest",
+    "sandbox": "node --env-file=scripts/sandbox/sandbox.env scripts/sandbox/start.mjs",
+    "seed:invoices": "node --env-file=.env.local scripts/seed-stripe-invoices.mjs",
+    "preflight": "bash scripts/preflight-local.sh",
+    "supabase": "supabase",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "env:local": "python3 scripts/configure-local-supabase.py"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
@@ -31,7 +42,12 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
@@ -39,8 +55,12 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-boundaries": "^5.4.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
+    "jsdom": "^29.1.1",
+    "pg": "^8.23.1",
     "prettier": "^3.8.1",
+    "supabase": "^2.118.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }

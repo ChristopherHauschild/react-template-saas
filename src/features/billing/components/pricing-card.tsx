@@ -1,12 +1,26 @@
 "use client";
 
-import { createCheckoutSession } from "../actions/create-checkout-session";
+import { useActionState } from "react";
+
+import {
+  type CheckoutActionResult,
+  createCheckoutSession,
+} from "../actions/create-checkout-session";
 import { Plan } from "../types/plan";
+
+import { SubscribeButton } from "./subscribe-button";
 
 type Props = { plan: Plan };
 
 export function PricingCard({ plan }: Props) {
   const isPopular = plan.popular;
+
+  // Expected problems (unknown/unavailable plan, existing subscription, …) come
+  // back as `state.error` and are shown inline; success redirects to Stripe.
+  const [state, formAction, pending] = useActionState<CheckoutActionResult, FormData>(
+    createCheckoutSession.bind(null, plan.id),
+    null,
+  );
 
   return (
     <div
@@ -54,26 +68,28 @@ export function PricingCard({ plan }: Props) {
         </ul>
       </div>
 
-      <form action={createCheckoutSession.bind(null, plan.priceId)} className="mt-6">
-        <button
-          className={`
-            w-full rounded-lg px-4 py-2 text-sm font-medium transition
-            ${
-              isPopular
-                ? `
-                bg-yellow-400 text-black
-                hover:bg-yellow-300
-              `
-                : `
-                bg-primary text-primary-foreground
-                hover:opacity-90
-              `
-            }
-          `}
-        >
-          Subscribe
-        </button>
-      </form>
+      {plan.available ? (
+        <form action={formAction} className="mt-6">
+          <SubscribeButton popular={isPopular} pending={pending} />
+          {state?.error && (
+            <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-400">
+              {state.error}
+            </p>
+          )}
+        </form>
+      ) : (
+        <div className="mt-6">
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            title="This plan cannot be purchased right now"
+            className="w-full cursor-not-allowed rounded-lg border border-border bg-muted px-4 py-2 text-sm font-medium text-muted-foreground"
+          >
+            Currently unavailable
+          </button>
+        </div>
+      )}
     </div>
   );
 }
