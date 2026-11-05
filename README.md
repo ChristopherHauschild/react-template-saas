@@ -141,20 +141,55 @@ The repository includes automated tests for authentication, subscriptions, invoi
 
 ## Roadmap
 
-This is an active personal project with approximately **120 hours of planned independent development**. The following estimates are planning targets, not completed work or a fixed delivery schedule.
+React SaaS Template is an actively maintained personal project with approximately **120 hours of planned independent development**. This is an overall planning estimate, not a fixed delivery schedule or a commitment to complete every proposed feature.
 
-| Planned work                  | Scope                                                                                                                                                                        |  Estimate |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------: |
-| **Notification Center**       | User-scoped notifications for successful security and billing events; unread counters, history, pagination, read/unread actions, deep links, event deduplication, and tests. |      30 h |
-| **Support Inbox**             | Evolve existing support requests into threaded conversations and an authorized support-side inbox, with replies, status changes, prioritization, and ownership controls.     |      35 h |
-| **Billing hardening**         | Improve subscription lifecycle reconciliation, failure recovery, edge cases, and provider integration coverage.                                                              |      20 h |
-| **Quality and accessibility** | Expand integration and browser coverage, improve accessibility, refine responsive UX, and address reliability gaps.                                                          |      20 h |
-| **Developer experience**      | Improve setup automation, documentation, CI checks, and local development workflows.                                                                                         |      15 h |
-| **Total planned**             |                                                                                                                                                                              | **120 h** |
+A detailed development plan is available in **[ROADMAP.md](./ROADMAP.md)**, including priorities, technical scope, dependencies, implementation considerations, and acceptance criteria.
 
-The Notification Center should reuse existing account activity and billing event handling rather than maintain a second, conflicting event source. The Support Inbox will build on the existing `support_requests` flow, adding a separately authorized staff workflow without exposing one customer's information to another.
+### Upcoming priorities
 
-Plans may change as the application evolves; work will be documented through normal commits and, where useful, issues or pull requests.
+**Notification Center**
+
+- In-app notifications for account security and billing events.
+- Unread notification counters, paginated history, and read/unread management.
+- Integration with existing account activity tracking and Stripe event handling.
+- Event deduplication, user isolation, and authorization tests.
+
+**Support Inbox**
+
+- Extend the existing support request system into threaded conversations.
+- Authorized support staff inbox with filtering, assignment, and request management.
+- Customer and support-agent replies, status tracking, and audit history.
+- Server-side authorization and database-level access controls.
+
+### Additional planned improvements
+
+- **Account recovery:** Self-service password recovery with secure email-based verification.
+- **Plan entitlements:** Server-enforced feature access based on subscription plans.
+- **Billing reliability:** Subscription reconciliation, payment failure recovery, and improved lifecycle handling.
+- **Guided onboarding:** Account setup checklist, progress tracking, and improved first-use experience.
+- **Account lifecycle:** Secure account deletion and improved data portability.
+- **Dashboard insights:** Meaningful account activity, billing, and support indicators based on real application data.
+- **Team workspaces:** Optional organization management, member invitations, and role-based permissions.
+- **End-to-end testing:** Playwright browser tests and automated GitHub Actions checks.
+- **Accessibility:** Keyboard navigation, screen reader support, responsive behavior, and UI improvements.
+- **Observability:** Structured error handling, diagnostics, and safe operational logging.
+- **Developer experience:** Improved local setup, environment configuration, documentation, and dependency maintenance.
+
+### Development approach
+
+Features will be developed incrementally, building on the existing architecture and reusing implemented functionality whenever possible.
+
+Each development task should include:
+
+- Clearly defined scope and expected behavior.
+- Appropriate authentication, authorization, and data isolation.
+- Automated tests covering successful and failure scenarios.
+- Responsive and accessible user interfaces where applicable.
+- Documentation of implementation decisions and known limitations.
+
+Priorities and scope may evolve as the application grows. All roadmap items represent **planned work**, not functionality already implemented.
+
+For detailed task descriptions and completion criteria, see **[Development Roadmap](./ROADMAP.md)**.
 
 ## Status and limitations
 
